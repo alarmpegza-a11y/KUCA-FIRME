@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Baufirmen (ključ u ruke) – Prijedor · Kozarac · Banja Luka</title>
+<title>Baufirmen &amp; Gewerke – Prijedor · Kozarac · Banja Luka</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js"></script>
@@ -21,6 +21,7 @@
     --warn: #B5813A;
     --bad: #A6473F;
     --star: #C99A2E;
+    --cat: #3E6B8A;
   }
   * { box-sizing: border-box; }
   html, body { height: 100%; margin: 0; }
@@ -35,22 +36,9 @@
     padding: 14px 24px 12px;
     border-bottom: 4px solid var(--brick);
   }
-  header h1{
-    margin: 0 0 4px;
-    font-size: 21px;
-    font-weight: 700;
-    letter-spacing: 0.2px;
-  }
-  header p{
-    margin: 0;
-    font-size: 13px;
-    color: #C9C2B6;
-  }
-  #syncStatus{
-    font-size: 11.5px;
-    margin-top: 6px;
-    color: #C9C2B6;
-  }
+  header h1{ margin: 0 0 4px; font-size: 21px; font-weight: 700; letter-spacing: 0.2px; }
+  header p{ margin: 0; font-size: 13px; color: #C9C2B6; }
+  #syncStatus{ font-size: 11.5px; margin-top: 6px; color: #C9C2B6; }
   #syncStatus.ok::before{ content: "● "; color: #7FBF7F; }
   #syncStatus.error::before{ content: "● "; color: #E08A7D; }
   #configBanner{
@@ -61,203 +49,75 @@
     padding: 8px 24px;
     border-bottom: 1px solid #5a4326;
   }
-  .layout{
-    display: grid;
-    grid-template-columns: 380px 1fr;
-    height: calc(100% - 68px);
-  }
-  @media (max-width: 860px){
-    .layout{ grid-template-columns: 1fr; grid-template-rows: 45vh 1fr; }
-  }
-  #sidebar{
-    background: var(--mortar);
-    border-right: 1px solid var(--line);
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-  }
-  .filters{
-    padding: 14px 14px 10px;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    border-bottom: 1px solid var(--line);
-    background: var(--mortar);
-    position: sticky;
-    top: 0;
-    z-index: 5;
-  }
-  .chip{
-    border: 1px solid var(--brick);
-    background: transparent;
-    color: var(--brick-dark);
-    padding: 5px 11px;
-    border-radius: 3px;
-    font-size: 12.5px;
-    cursor: pointer;
-    font-weight: 600;
-  }
-  .chip.active{
-    background: var(--brick);
-    color: var(--paper);
-  }
+  .layout{ display: grid; grid-template-columns: 400px 1fr; height: calc(100% - 78px); }
+  @media (max-width: 860px){ .layout{ grid-template-columns: 1fr; grid-template-rows: 45vh 1fr; } }
+  #sidebar{ background: var(--mortar); border-right: 1px solid var(--line); overflow-y: auto; display: flex; flex-direction: column; }
+  .filters{ padding: 12px 14px 6px; display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 1px solid var(--line); background: var(--mortar); position: sticky; top: 0; z-index: 5; }
+  .filters.cat-row{ padding-top: 0; padding-bottom: 10px; }
+  .chip{ border: 1px solid var(--brick); background: transparent; color: var(--brick-dark); padding: 5px 11px; border-radius: 3px; font-size: 12.5px; cursor: pointer; font-weight: 600; }
+  .chip.active{ background: var(--brick); color: var(--paper); }
+  .chip.cat-chip{ border-color: var(--cat); color: var(--cat); }
+  .chip.cat-chip.active{ background: var(--cat); color: var(--paper); }
   .chip.fav-chip.active{ background: var(--star); border-color: var(--star); }
-  #search{
-    margin: 10px 14px 6px;
-    padding: 8px 10px;
-    border: 1px solid var(--line);
-    border-radius: 3px;
-    font-size: 13px;
-    background: var(--paper);
-  }
-  #count{
-    padding: 0 14px 8px;
-    font-size: 12px;
-    color: var(--ink-soft);
-  }
-  #list{
-    list-style: none;
-    margin: 0;
-    padding: 0 10px 16px;
-  }
-  .card{
-    background: var(--paper);
-    border: 1px solid var(--line);
-    border-left: 3px solid var(--brick);
-    border-radius: 2px;
-    padding: 10px 12px;
-    margin-bottom: 8px;
-  }
+  #search{ margin: 10px 14px 6px; padding: 8px 10px; border: 1px solid var(--line); border-radius: 3px; font-size: 13px; background: var(--paper); }
+  #count{ padding: 0 14px 8px; font-size: 12px; color: var(--ink-soft); }
+  #list{ list-style: none; margin: 0; padding: 0 10px 16px; }
+  .card{ background: var(--paper); border: 1px solid var(--line); border-left: 3px solid var(--brick); border-radius: 2px; padding: 10px 12px; margin-bottom: 8px; }
   .card.is-fav{ border-left-color: var(--star); background: #FFFBF0; }
   .card.is-contacted{ opacity: 0.72; }
   .card-main{ cursor: pointer; }
   .card-main:hover h3{ text-decoration: underline; }
-  .card h3{
-    margin: 0 0 3px;
-    font-size: 14px;
-    font-weight: 700;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .card .city-tag{
-    display:inline-block;
-    font-size: 10.5px;
-    font-weight: 700;
-    color: var(--brick-dark);
-    background: #F1E4DC;
-    padding: 1px 6px;
-    border-radius: 2px;
-    margin-bottom: 5px;
-  }
-  .card .addr{
-    font-size: 12px;
-    color: var(--ink-soft);
-    margin-bottom: 4px;
-  }
-  .card .rating{
-    font-size: 12px;
-    font-weight: 600;
-  }
+  .card h3{ margin: 0 0 3px; font-size: 14px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+  .tag{ display:inline-block; font-size: 10.5px; font-weight: 700; padding: 1px 6px; border-radius: 2px; margin: 0 4px 5px 0; }
+  .city-tag{ color: var(--brick-dark); background: #F1E4DC; }
+  .cat-tag{ color: var(--cat); background: #E3ECF1; }
+  .card .addr{ font-size: 12px; color: var(--ink-soft); margin-bottom: 4px; }
+  .card .rating{ font-size: 12px; font-weight: 600; }
   .rating.good{ color: var(--good); }
   .rating.warn{ color: var(--warn); }
   .rating.bad{ color: var(--bad); }
   .rating.none{ color: var(--ink-soft); font-weight: 400;}
   #map{ width: 100%; height: 100%; }
 
-  .card-controls{
-    margin-top: 8px;
-    padding-top: 8px;
-    border-top: 1px dashed var(--line);
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
+  .card-controls{ margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); display: flex; flex-direction: column; gap: 6px; }
   .controls-row{ display: flex; align-items: center; gap: 10px; }
-  .fav-btn{
-    border: none;
-    background: none;
-    font-size: 18px;
-    line-height: 1;
-    cursor: pointer;
-    color: var(--line);
-    padding: 0;
-  }
+  .fav-btn{ border: none; background: none; font-size: 18px; line-height: 1; cursor: pointer; color: var(--line); padding: 0; }
   .fav-btn.active{ color: var(--star); }
-  .contacted-label{
-    font-size: 12px;
-    color: var(--ink-soft);
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    cursor: pointer;
-  }
-  textarea[data-note]{
-    width: 100%;
-    min-height: 44px;
-    font-family: inherit;
-    font-size: 12px;
-    padding: 6px 7px;
-    border: 1px solid var(--line);
-    border-radius: 2px;
-    resize: vertical;
-    background: #fff;
-  }
-  textarea[data-note]:focus{ outline: 1px solid var(--brick); }
-  .note-saved{
-    font-size: 10.5px;
-    color: var(--good);
-    height: 12px;
-  }
+  .contacted-label{ font-size: 12px; color: var(--ink-soft); display: flex; align-items: center; gap: 5px; cursor: pointer; }
+  textarea[data-note], textarea[data-email]{ width: 100%; min-height: 40px; font-family: inherit; font-size: 12px; padding: 6px 7px; border: 1px solid var(--line); border-radius: 2px; resize: vertical; background: #fff; }
+  textarea[data-note]:focus, textarea[data-email]:focus{ outline: 1px solid var(--brick); }
+  .field-label{ font-size: 10.5px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: 0.3px; margin-bottom: 2px; }
+  .docs-box{ margin-top: 4px; padding: 8px; background: #FFF8EC; border: 1px dashed var(--star); border-radius: 3px; display: flex; flex-direction: column; gap: 6px; }
+  .file-upload-btn{ align-self: flex-start; border: 1px solid var(--cat); background: #fff; color: var(--cat); font-size: 11.5px; font-weight: 700; padding: 5px 10px; border-radius: 3px; cursor: pointer; }
+  .file-list{ display: flex; flex-direction: column; gap: 4px; }
+  .file-item{ display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; background: #fff; border: 1px solid var(--line); border-radius: 2px; padding: 4px 7px; }
+  .file-item a{ color: var(--brick-dark); text-decoration: none; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 190px; }
+  .file-item a:hover{ text-decoration: underline; }
+  .file-del{ border: none; background: none; color: var(--bad); cursor: pointer; font-size: 13px; padding: 0 0 0 6px; }
+  .upload-status{ font-size: 10.5px; color: var(--ink-soft); }
 
-  /* Leaflet popup styling */
-  .leaflet-popup-content-wrapper{
-    border-radius: 3px;
-    border-top: 3px solid var(--brick);
-  }
-  .leaflet-popup-content{ width: 260px !important; }
-  .popup h3{
-    margin: 0 0 4px;
-    font-size: 15px;
-    color: var(--ink);
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
-  .popup .city-tag{
-    display:inline-block;
-    font-size: 10.5px;
-    font-weight: 700;
-    color: var(--brick-dark);
-    background: #F1E4DC;
-    padding: 1px 6px;
-    border-radius: 2px;
-    margin-bottom: 6px;
-  }
+  .leaflet-popup-content-wrapper{ border-radius: 3px; border-top: 3px solid var(--brick); }
+  .leaflet-popup-content{ width: 270px !important; }
+  .popup h3{ margin: 0 0 4px; font-size: 15px; color: var(--ink); display: flex; align-items: center; gap: 6px; }
   .popup p{ margin: 3px 0; font-size: 12.5px; line-height: 1.4; }
   .popup .rating{ font-weight: 600; }
   .popup a{ color: var(--brick-dark); text-decoration: none; font-weight: 600; }
   .popup a:hover{ text-decoration: underline; }
-  .popup .maplink{
-    display: inline-block;
-    margin-top: 6px;
-    font-size: 12px;
-  }
+  .popup .maplink{ display: inline-block; margin-top: 6px; font-size: 12px; }
   .popup hr{ border: none; border-top: 1px solid var(--line); margin: 6px 0; }
 </style>
 </head>
 <body>
 <header>
-  <h1>Baufirmen für Ključ u ruke – Prijedor, Kozarac &amp; Banja Luka</h1>
-  <p>Nur klassische Baufirmen (Mauerwerk) · keine Baustoffhändler, keine Montažne-kuće-Anbieter · Grösse als grobe Einschätzung markiert</p>
+  <h1>Baufirmen &amp; Gewerke – Prijedor, Kozarac &amp; Banja Luka</h1>
+  <p>Ključ-u-ruke-Baufirmen plus Pool, Sanitär, Heizung/Wärmepumpe, Elektro und Fenster/Stolarija · keine reinen Baustoffhändler</p>
   <div id="syncStatus"></div>
 </header>
-<div id="configBanner">
-  ⚠ Firebase ist noch nicht konfiguriert – trage deine Projektdaten im Script-Block <code>firebaseConfig</code> ein (siehe Kommentar im Code). Favoriten/Notizen/Kontaktiert werden bis dahin nur im Speicher gehalten und gehen beim Schliessen verloren.
-</div>
+<div id="configBanner"></div>
 <div class="layout">
   <div id="sidebar">
     <div class="filters" id="filters"></div>
+    <div class="filters cat-row" id="catFilters"></div>
     <input id="search" type="text" placeholder="Firma suchen…">
     <div id="count"></div>
     <ul id="list"></ul>
@@ -268,10 +128,11 @@
 <script>
 // ============================================================
 // FIREBASE KONFIGURATION
-// Trage hier deine eigenen Projektdaten ein (Firebase Console
-// -> Projekteinstellungen -> Allgemein -> Deine Apps -> SDK-Konfiguration).
-// Firestore-Regeln (wie von dir vorgegeben, bis 2050 offen):
+// Nur Firestore wird benötigt (kein Storage) – Dokumente/E-Mails werden
+// als Base64-Text direkt im Firestore-Dokument gespeichert (Firestore-
+// Limit: ca. 1 MB pro Dokument, reicht für normale PDFs/E-Mail-Texte).
 //
+// Firestore-Regeln:
 // rules_version = '2';
 // service cloud.firestore {
 //   match /databases/{database}/documents {
@@ -293,14 +154,15 @@ const firebaseConfig = {
 let db = null;
 let firebaseReady = false;
 const syncStatusEl = document.getElementById('syncStatus');
+const configBanner = document.getElementById('configBanner');
 
 function isConfigFilledIn(){
   return !Object.values(firebaseConfig).some(v => typeof v === "string" && v.startsWith("DEIN"));
 }
 
 if(typeof firebase === "undefined"){
-  document.getElementById('configBanner').style.display = "block";
-  document.getElementById('configBanner').textContent = "⚠ Die Firebase-Bibliothek konnte nicht geladen werden (Netzwerk/Werbeblocker?). Prüfe im Browser die Konsole (F12) und den Netzwerk-Tab auf blockierte Anfragen zu gstatic.com.";
+  configBanner.style.display = "block";
+  configBanner.textContent = "⚠ Die Firebase-Bibliothek konnte nicht geladen werden (Netzwerk/Werbeblocker?). Prüfe im Browser die Konsole (F12) und den Netzwerk-Tab auf blockierte Anfragen zu gstatic.com.";
   syncStatusEl.textContent = "Firebase-Skripte nicht geladen.";
   syncStatusEl.className = "error";
 }else if(isConfigFilledIn()){
@@ -315,48 +177,69 @@ if(typeof firebase === "undefined"){
     syncStatusEl.className = "error";
   }
 }else{
-  document.getElementById('configBanner').style.display = "block";
+  configBanner.style.display = "block";
+  configBanner.textContent = "⚠ Firebase ist noch nicht konfiguriert – trage deine Projektdaten im Script-Block firebaseConfig ein.";
   syncStatusEl.textContent = "Firebase nicht konfiguriert – nur temporärer Speicher.";
   syncStatusEl.className = "error";
 }
 
 // ---------- Datensatz ----------
 // Quelle: Google Places (Recherche September 2026). Bewertungssummary ist eine
-// eigene Einschätzung basierend auf den vorhandenen Google-Rezensionen, keine wörtliche Wiedergabe.
-// Gefiltert auf: klassische Baufirmen (gemauerte Bauweise, "ključ u ruke"), keine Baustoffhändler,
-// keine Montažne-kuće/Fertigbau-Anbieter (andere Bauweise als gewünscht), tendenziell grössere Firmen.
+// eigene Einschätzung, keine wörtliche Wiedergabe der Original-Rezensionen.
 const firmen = [
-  // --- Prijedor ---
-  {name:"Gradinvest Prijedor d.o.o.", ort:"Prijedor", adresse:"Meše Selimovića 5, Prijedor", tel:"+387 65 513-716", lat:44.9853624, lng:16.7032059, rating:4.3, count:3, groesse:"unklar", note:"Wenige Bewertungen, eine davon deutlich negativ ('loš posao') – vor Beauftragung genauer nachfragen.", placeId:"ChIJyb80p3szZ0cRNsSjZZlQupc"},
-  {name:"MB Modul", ort:"Prijedor", adresse:"M4, Prijedor", tel:"+387 52 334-290", lat:45.0005698, lng:16.6732322, rating:4.7, count:3, groesse:"mittel", note:"Bewertungen heben professionelles, seriöses Auftreten hervor.", placeId:"ChIJ-RYA7xUzZ0cR6vt4Ow3P2pA"},
-  {name:"GM-MEL d.o.o.", ort:"Prijedor", adresse:"Aleja kozarskog odreda, Prijedor", tel:"+387 65 201-020", lat:44.9679427, lng:16.7119732, rating:null, count:0, groesse:"unklar", note:"Noch keine Google-Bewertungen vorhanden.", placeId:"ChIJR0A0xaHNYEcRX8-xjN489cY"},
-  {name:"Qubico homes d.o.o.", ort:"Prijedor", adresse:"1. maja 63, Prijedor", tel:"+387 66 686-310", lat:44.9769861, lng:16.729258, rating:null, count:0, groesse:"unklar", note:"Noch keine Google-Bewertungen vorhanden.", placeId:"ChIJPTwWyjM1Z0cRFZco2EA9xFM"},
+  // ===== OPĆI IZVOĐAČ (Ključ u ruke, Mauerwerk) =====
+  {name:"Gradinvest Prijedor d.o.o.", kategorie:"Opći izvođač", ort:"Prijedor", adresse:"Meše Selimovića 5, Prijedor", tel:"+387 65 513-716", lat:44.9853624, lng:16.7032059, rating:4.3, count:3, groesse:"unklar", note:"Wenige Bewertungen, eine davon deutlich negativ ('loš posao') – vor Beauftragung genauer nachfragen.", placeId:"ChIJyb80p3szZ0cRNsSjZZlQupc"},
+  {name:"MB Modul", kategorie:"Opći izvođač", ort:"Prijedor", adresse:"M4, Prijedor", tel:"+387 52 334-290", lat:45.0005698, lng:16.6732322, rating:4.7, count:3, groesse:"mittel", note:"Bewertungen heben professionelles, seriöses Auftreten hervor.", placeId:"ChIJ-RYA7xUzZ0cR6vt4Ow3P2pA"},
+  {name:"GM-MEL d.o.o.", kategorie:"Opći izvođač", ort:"Prijedor", adresse:"Aleja kozarskog odreda, Prijedor", tel:"+387 65 201-020", lat:44.9679427, lng:16.7119732, rating:null, count:0, groesse:"unklar", note:"Noch keine Google-Bewertungen vorhanden.", placeId:"ChIJR0A0xaHNYEcRX8-xjN489cY"},
+  {name:"Qubico homes d.o.o.", kategorie:"Opći izvođač", ort:"Prijedor", adresse:"1. maja 63, Prijedor", tel:"+387 66 686-310", lat:44.9769861, lng:16.729258, rating:null, count:0, groesse:"unklar", note:"Noch keine Google-Bewertungen vorhanden.", placeId:"ChIJPTwWyjM1Z0cRFZco2EA9xFM"},
+  {name:"Amir Gradnja s.p.", kategorie:"Opći izvođač", ort:"Kozarac", adresse:"Trnopolje bb, Sivci, Kozarac", tel:"+387 60 35 39 035", lat:44.9445177, lng:16.8225156, rating:5.0, count:1, groesse:"klein", note:"Sehr wenige Bewertungen, eher kleiner Betrieb – Kapazität vor Ort erfragen.", placeId:"ChIJg0K5EmC1YEcRg6TBWWvSodo"},
+  {name:"GD \"Novogradnja\" d.o.o.", kategorie:"Opći izvođač", ort:"Banja Luka", adresse:"Cerska 14, Banja Luka", tel:"+387 51 432-902", lat:44.7605522, lng:17.201302, rating:5.0, count:8, groesse:"mittel", note:"Durchweg positive Bewertungen, als zuverlässig beschrieben.", placeId:"ChIJ9TwezawDXkcRND-CwaItyIM"},
+  {name:"TEKTON d.o.o.", kategorie:"Opći izvođač", ort:"Banja Luka", adresse:"Jovana Dučića 39, Banja Luka", tel:"+387 51 300-077", lat:44.7773447, lng:17.1890232, rating:4.5, count:6, groesse:"mittel", note:"Als professionell und kompetent beschrieben.", placeId:"ChIJDaKSzQcDXkcRMpTL6F-QQLI"},
+  {name:"GP \"Krajina\" a.d.", kategorie:"Opći izvođač", ort:"Banja Luka", adresse:"Trg srpskih junaka 4, Banja Luka", tel:"+387 51 215-611", lat:44.7728197, lng:17.1901111, rating:5.0, count:6, groesse:"gross", note:"Aktiengesellschaft (a.d.) mit langer Tradition – eine der grösseren, etablierten Baufirmen der Region.", placeId:"ChIJJcMBjhsDXkcRJAfSuSbKWPQ"},
+  {name:"G.P. Vranica BL d.o.o.", kategorie:"Opći izvođač", ort:"Banja Luka", adresse:"Jovana Bijelića, Banja Luka", tel:"+387 51 385-204", lat:44.8237336, lng:17.207996, rating:4.9, count:9, groesse:"gross", note:"Sehr gute Bewertungen, mehrfach als eine der besten Baufirmen der Region genannt.", placeId:"ChIJXbjhzIABXkcRqwpKRK40ZZQ"},
+  {name:"Hogar doo", kategorie:"Opći izvođač", ort:"Banja Luka", adresse:"Milana Karanovića 51, Banja Luka", tel:"+387 66 017-666", lat:44.7701528, lng:17.2110067, rating:5.0, count:6, groesse:"mittel", note:"Durchweg positive Empfehlungen.", placeId:"ChIJby1q6NADXkcR36fZflUv_lk"},
+  {name:"Građenje – Đurić d.o.o.", kategorie:"Opći izvođač", ort:"Banja Luka", adresse:"Ozrenska 11, Banja Luka", tel:"+387 51 272-002", lat:44.7933467, lng:17.1430507, rating:4.3, count:27, groesse:"gross", note:"Grösserer Betrieb – einige loben die Qualität, mehrere kritisieren schlechte Erreichbarkeit nach Auftragsende.", placeId:"ChIJBwgZTp-pYEcRnYprvfj3NiM"},
+  {name:"Agencija Mrav", kategorie:"Opći izvođač", ort:"Banja Luka", adresse:"Saračica bb, Banja Luka", tel:"+387 65 363-693", lat:44.799658, lng:17.1066655, rating:5.0, count:9, groesse:"mittel", note:"Zuverlässigkeit und Termintreue werden mehrfach hervorgehoben.", placeId:"ChIJVya6F_ypYEcRq0Tz-2vAcEc"},
+  {name:"Arting Invest", kategorie:"Opći izvođač", ort:"Gradiška", adresse:"Mitropolita Georgija Nikolajevića 3, Gradiška", tel:"+387 51 815-825", lat:45.146184, lng:17.2534013, rating:4.0, count:9, groesse:"mittel", note:"Als solides, auf Qualität bedachtes Bauunternehmen beschrieben.", placeId:"ChIJcRcRYCdcZ0cRAMT4O9ZQ7yM"},
+  {name:"Gradid", kategorie:"Opći izvođač", ort:"Gradiška", adresse:"Miloša Crnjanskog, Gradiška", tel:"+387 51 830-330", lat:45.1480234, lng:17.2613733, rating:null, count:0, groesse:"unklar", note:"Noch keine Google-Bewertungen vorhanden.", placeId:"ChIJm1C2VZteZ0cRgjixtUmU2ao"},
 
-  // --- Kozarac ---
-  {name:"Amir Gradnja s.p.", ort:"Kozarac", adresse:"Trnopolje bb, Sivci, Kozarac", tel:"+387 60 35 39 035", lat:44.9445177, lng:16.8225156, rating:5.0, count:1, groesse:"klein", note:"Sehr wenige Bewertungen, eher kleiner Betrieb – direkt vor Ort erkundigen, ob Kapazität für ein ganzes Haus da ist.", placeId:"ChIJg0K5EmC1YEcRg6TBWWvSodo"},
+  // ===== BAZENI (Pool) =====
+  {name:"Lumino d.o.o.", kategorie:"Bazeni", ort:"Banja Luka", adresse:"Marije Dimić 9, Banja Luka", tel:"+387 51 355-234", lat:44.7906064, lng:17.196609, rating:4.4, count:50, groesse:"mittel", note:"Mehrfach explizit als erste Wahl für Pool-Bau empfohlen.", placeId:"ChIJ0YmG86wDXkcRLhEvX2RBT24"},
+  {name:"Novak Bazeni d.o.o.", kategorie:"Bazeni", ort:"Banja Luka", adresse:"Jovana Dučića 100, Banja Luka", tel:"+387 66 114-303", lat:44.7781707, lng:17.1904503, rating:5.0, count:10, groesse:"unklar", note:"Spezialisiert auf Pools laut Firmenname, gute Bewertung.", placeId:"ChIJN6u0-cYDXkcREt9YelqctW8"},
 
-  // --- Banja Luka ---
-  {name:"GD \"Novogradnja\" d.o.o.", ort:"Banja Luka", adresse:"Cerska 14, Banja Luka", tel:"+387 51 432-902", lat:44.7605522, lng:17.201302, rating:5.0, count:8, groesse:"mittel", note:"Durchweg positive Bewertungen, als zuverlässig beschrieben.", placeId:"ChIJ9TwezawDXkcRND-CwaItyIM"},
-  {name:"TEKTON d.o.o.", ort:"Banja Luka", adresse:"Jovana Dučića 39, Banja Luka", tel:"+387 51 300-077", lat:44.7773447, lng:17.1890232, rating:4.5, count:6, groesse:"mittel", note:"Als professionell und kompetent beschrieben.", placeId:"ChIJDaKSzQcDXkcRMpTL6F-QQLI"},
-  {name:"GP \"Krajina\" a.d.", ort:"Banja Luka", adresse:"Trg srpskih junaka 4, Banja Luka", tel:"+387 51 215-611", lat:44.7728197, lng:17.1901111, rating:5.0, count:6, groesse:"gross", note:"Aktiengesellschaft (a.d.) mit langer Tradition – eine der grösseren, etablierten Baufirmen der Region.", placeId:"ChIJJcMBjhsDXkcRJAfSuSbKWPQ"},
-  {name:"G.P. Vranica BL d.o.o.", ort:"Banja Luka", adresse:"Jovana Bijelića, Banja Luka", tel:"+387 51 385-204", lat:44.8237336, lng:17.207996, rating:4.9, count:9, groesse:"gross", note:"Sehr gute Bewertungen, mehrfach als eine der besten Baufirmen der Region genannt.", placeId:"ChIJXbjhzIABXkcRqwpKRK40ZZQ"},
-  {name:"Hogar doo", ort:"Banja Luka", adresse:"Milana Karanovića 51, Banja Luka", tel:"+387 66 017-666", lat:44.7701528, lng:17.2110067, rating:5.0, count:6, groesse:"mittel", note:"Durchweg positive Empfehlungen.", placeId:"ChIJby1q6NADXkcR36fZflUv_lk"},
-  {name:"Građenje – Đurić d.o.o.", ort:"Banja Luka", adresse:"Ozrenska 11, Banja Luka", tel:"+387 51 272-002", lat:44.7933467, lng:17.1430507, rating:4.3, count:27, groesse:"gross", note:"Grösserer Betrieb (viele Rezensionen) – einige loben die Qualität, mehrere kritisieren schlechte Erreichbarkeit nach Auftragsende.", placeId:"ChIJBwgZTp-pYEcRnYprvfj3NiM"},
-  {name:"Agencija Mrav", ort:"Banja Luka", adresse:"Saračica bb, Banja Luka", tel:"+387 65 363-693", lat:44.799658, lng:17.1066655, rating:5.0, count:9, groesse:"mittel", note:"Zuverlässigkeit und Termintreue werden mehrfach hervorgehoben.", placeId:"ChIJVya6F_ypYEcRq0Tz-2vAcEc"},
+  // ===== SANITÄR / VODOINSTALACIJE =====
+  {name:"Vodoinstalater Banja Luka Rako", kategorie:"Sanitär", ort:"Banja Luka", adresse:"Muhameda Mehmedbašića 5, Banja Luka", tel:"+387 65 546-390", lat:44.758883, lng:17.1775964, rating:4.7, count:13, groesse:"klein", note:"Meist sehr gute Bewertungen zu Termintreue, eine einzelne negative Stimme.", placeId:"ChIJbzRa0icDXkcRFTUA9XivPJI"},
+  {name:"DDK Odštopavanje/Vodoinstalacije", kategorie:"Sanitär", ort:"Banja Luka", adresse:"Kuljanska 12, Banja Luka", tel:"+387 66 519-403", lat:44.845076, lng:17.2122259, rating:5.0, count:132, groesse:"mittel", note:"Sehr viele durchweg positive Bewertungen, 24h erreichbar.", placeId:"ChIJeeL-gSEBXkcRd1vUqWPDCFk"},
+  {name:"Vodoinstalater \"Vodosanit\" Ž. Trivić", kategorie:"Sanitär", ort:"Banja Luka", adresse:"Grabovac 188, Banja Luka", tel:"+387 66 990-149", lat:44.751854, lng:17.3781219, rating:null, count:0, groesse:"klein", note:"Noch keine Google-Bewertungen vorhanden.", placeId:"ChIJwdrK9NgPXkcR1WLzYLi9O7s"},
 
-  // --- Gradiška (Bonus, an der Route Prijedor–Banja Luka) ---
-  {name:"Arting Invest", ort:"Gradiška", adresse:"Mitropolita Georgija Nikolajevića 3, Gradiška", tel:"+387 51 815-825", lat:45.146184, lng:17.2534013, rating:4.0, count:9, groesse:"mittel", note:"Als solides, auf Qualität bedachtes Bauunternehmen beschrieben.", placeId:"ChIJcRcRYCdcZ0cRAMT4O9ZQ7yM"},
-  {name:"Gradid", ort:"Gradiška", adresse:"Miloša Crnjanskog, Gradiška", tel:"+387 51 830-330", lat:45.1480234, lng:17.2613733, rating:null, count:0, groesse:"unklar", note:"Noch keine Google-Bewertungen vorhanden.", placeId:"ChIJm1C2VZteZ0cRgjixtUmU2ao"},
+  // ===== GRIJANJE / KLIMA (inkl. Wärmepumpe) =====
+  {name:"DK Grijanje d.o.o.", kategorie:"Grijanje", ort:"Banja Luka", adresse:"Banja Luka (genaue Adresse via Google Maps)", tel:null, lat:44.7829841, lng:17.162818, rating:4.8, count:4, groesse:"mittel", note:"Gute, wenn auch wenige Bewertungen.", placeId:"ChIJW8Jg6lwDXkcR92cM77jOboE"},
+  {name:"Klima San Plus", kategorie:"Grijanje", ort:"Prijedor", adresse:"Porodice Pavičić 4, Prijedor", tel:"+387 65 747-535", lat:44.9906999, lng:16.7315083, rating:5.0, count:62, groesse:"mittel", note:"Sehr viele durchweg positive Bewertungen für Klima-/Wärmepumpen-Installation.", placeId:"ChIJNXqXOZc1Z0cRjGA51zIfuiw"},
+  {name:"Termoklima Prijedor", kategorie:"Grijanje", ort:"Prijedor", adresse:"Kozarska br.74, Prijedor", tel:"+387 52 236-813", lat:44.9831281, lng:16.7229635, rating:4.6, count:10, groesse:"unklar", note:"Verkauft und installiert Heizung/Wärmepumpen/Klima – Fachhandel mit Montage, nicht reiner Baustoffhändler.", placeId:"ChIJd1_t-l81Z0cRGb-zNrEnJZo"},
+  {name:"Heating Cooling", kategorie:"Grijanje", ort:"Prijedor", adresse:"Prijedor (Region)", tel:"+387 66 094-472", lat:44.9365104, lng:16.7242551, rating:5.0, count:1, groesse:"unklar", note:"Sehr wenige Bewertungen – Referenzen erfragen.", placeId:"ChIJ47TLzBDLYEcR_g_PmWdWynQ"},
+
+  // ===== ELEKTRO =====
+  {name:"TIM ELEKTRO INŽENJERING d.o.o.", kategorie:"Elektro", ort:"Banja Luka", adresse:"Bulevar vojvode Stepe Stepanovića 177, Banja Luka", tel:"+387 66 054-290", lat:44.766357, lng:17.206201, rating:5.0, count:7, groesse:"mittel", note:"Durchweg positive Bewertungen für Elektroinstallationen.", placeId:"ChIJLfRPJ-t3GYERJ5wLlNhd_Cg"},
+  {name:"ELEKTRIČAR Banja Luka", kategorie:"Elektro", ort:"Banja Luka", adresse:"Nikole Pašića, Banja Luka", tel:"+387 66 690-109", lat:44.7681434, lng:17.1957011, rating:4.8, count:18, groesse:"klein", note:"Sehr gute Bewertungen, schnell und zuverlässig.", placeId:"ChIJ5YQ5UO4DXkcRjF53IURDZ6E"},
+  {name:"Elektro BAŠIĆ Prijedor", kategorie:"Elektro", ort:"Prijedor", adresse:"Omladinski put 70, Čirkin Polje, Prijedor", tel:"+387 65 167-267", lat:44.9821631, lng:16.7439978, rating:4.0, count:4, groesse:"klein", note:"Gute Bewertungen zu Schnelligkeit und Korrektheit.", placeId:"ChIJBTFeEwA1Z0cR_ZfKNiz4eLs"},
+
+  // ===== FENSTER / STOLARIJA =====
+  {name:"ALU i PVC Stolarija Simić", kategorie:"Fenster", ort:"Banja Luka", adresse:"Blagoja Parovića 39, Banja Luka", tel:"+387 65 915-851", lat:44.8286359, lng:17.2119472, rating:4.6, count:13, groesse:"mittel", note:"Sehr gute Bewertungen zu Qualität und Professionalität.", placeId:"ChIJ7fcVT7ZgJ20Rr16oTI-K5b8"},
+  {name:"Marjanplast", kategorie:"Fenster", ort:"Prijedor", adresse:"Vidovdanska 11, Prijedor", tel:"+387 52 211-499", lat:44.9804327, lng:16.7119427, rating:5.0, count:14, groesse:"mittel", note:"Sehr gute, ausführliche Bewertungen zu Handwerksqualität.", placeId:"ChIJW4wjNVAzZ0cREghOVl1HsWs"},
+  {name:"Luka prozori i vrata", kategorie:"Fenster", ort:"Banja Luka", adresse:"Put srpskih branilaca 214, Banja Luka", tel:"+387 51 366-350", lat:44.8277267, lng:17.2180349, rating:4.2, count:10, groesse:"unklar", note:"Überwiegend sehr gute Bewertungen, aber ein ernster Beschwerdefall zu Reklamationsdauer – Garantieklauseln genau prüfen.", placeId:"ChIJm6cZboQBXkcRRxizPX0y8cI"},
+  {name:"PVC STOLARIJA BM Janjušić", kategorie:"Fenster", ort:"Prijedor", adresse:"Ulica Orlovci bb, Prijedor", tel:"+387 66 336-142", lat:44.9863855, lng:16.7767293, rating:4.5, count:28, groesse:"unklar", note:"Vorsicht – mehrere deutliche Beschwerden zu Reaktionszeit und Reklamationsbearbeitung trotz insgesamt gutem Schnitt.", placeId:"ChIJf4jysTQ1Z0cRCq2pSFJCac8"},
 ];
 
 const cities = ["Alle", "Prijedor", "Kozarac", "Banja Luka", "Gradiška"];
+const kategorien = ["Alle", "Opći izvođač", "Bazeni", "Sanitär", "Grijanje", "Elektro", "Fenster"];
 let activeCity = "Alle";
+let activeCategory = "Alle";
 let activeSearch = "";
 let onlyFav = false;
 
-// status[placeId] = { favorite: bool, contacted: bool, note: string }
+// status[placeId] = { favorite, contacted, note, emailText, files: [{name,url,path,uploadedAt}] }
 const status = {};
-firmen.forEach(f => { status[f.placeId] = { favorite: false, contacted: false, note: "" }; });
+firmen.forEach(f => { status[f.placeId] = { favorite: false, contacted: false, note: "", emailText: "", files: [] }; });
 
 // ---------- Firestore Sync ----------
 if(firebaseReady){
@@ -366,7 +249,9 @@ if(firebaseReady){
       status[change.doc.id] = {
         favorite: !!d.favorite,
         contacted: !!d.contacted,
-        note: d.note || ""
+        note: d.note || "",
+        emailText: d.emailText || "",
+        files: Array.isArray(d.files) ? d.files : []
       };
     });
     syncStatusEl.textContent = "Synchronisiert mit Firebase";
@@ -375,7 +260,7 @@ if(firebaseReady){
     refreshOpenPopups();
   }, err => {
     console.error("Firestore-Fehler:", err);
-    syncStatusEl.textContent = "Firebase-Fehler – prüfe Firestore-Regeln/Config.";
+    syncStatusEl.textContent = "Firebase-Fehler: " + err.message;
     syncStatusEl.className = "error";
   });
 }
@@ -387,18 +272,38 @@ function saveStatus(placeId, patch){
       .catch(err => console.error("Speichern fehlgeschlagen:", err));
   }
 }
-function toggleFavorite(placeId){
-  saveStatus(placeId, { favorite: !status[placeId].favorite });
+function toggleFavorite(placeId){ saveStatus(placeId, { favorite: !status[placeId].favorite }); render(); refreshOpenPopups(); }
+function toggleContacted(placeId, checked){ saveStatus(placeId, { contacted: checked }); render(); refreshOpenPopups(); }
+function saveNote(placeId, value){ saveStatus(placeId, { note: value }); }
+function saveEmailText(placeId, value){ saveStatus(placeId, { emailText: value }); }
+
+function uploadFile(placeId, file){
+  const MAX_BYTES = 650000; // Reserve lassen für andere Felder im 1MB-Firestore-Limit
+  if(file.size > MAX_BYTES){
+    setUploadMsg(placeId, "Datei zu groß (" + Math.round(file.size/1024) + " KB) – Firestore-Dokumente sind auf ca. 1 MB begrenzt. Bitte kleinere/komprimierte Datei verwenden.");
+    return;
+  }
+  setUploadMsg(placeId, "Lade hoch: " + file.name + " …");
+  const reader = new FileReader();
+  reader.onload = () => {
+    const newFiles = [...status[placeId].files, { name: file.name, dataUrl: reader.result, uploadedAt: Date.now(), size: file.size }];
+    saveStatus(placeId, { files: newFiles });
+    setUploadMsg(placeId, "");
+    render();
+    refreshOpenPopups();
+  };
+  reader.onerror = () => setUploadMsg(placeId, "Fehler beim Lesen der Datei.");
+  reader.readAsDataURL(file);
+}
+function deleteFile(placeId, index){
+  const newFiles = status[placeId].files.filter((_, i) => i !== index);
+  saveStatus(placeId, { files: newFiles });
   render();
   refreshOpenPopups();
 }
-function toggleContacted(placeId, checked){
-  saveStatus(placeId, { contacted: checked });
-  render();
-  refreshOpenPopups();
-}
-function saveNote(placeId, value){
-  saveStatus(placeId, { note: value });
+const uploadMsgEls = {};
+function setUploadMsg(placeId, msg){
+  document.querySelectorAll('[data-uploadmsg="' + placeId + '"]').forEach(el => { el.textContent = msg; });
 }
 
 // ---------- Karte ----------
@@ -408,39 +313,51 @@ L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
   attribution: '&copy; OpenStreetMap-Mitwirkende'
 }).addTo(map);
 
-function ratingClass(r){
-  if(r === null) return "none";
-  if(r >= 4.5) return "good";
-  if(r >= 4.0) return "warn";
-  return "bad";
-}
-function ratingLabel(f){
-  if(f.rating === null) return "Keine Bewertungen";
-  return "★ " + f.rating.toFixed(1) + " (" + f.count + ")";
-}
+function ratingClass(r){ if(r === null) return "none"; if(r >= 4.5) return "good"; if(r >= 4.0) return "warn"; return "bad"; }
+function ratingLabel(f){ if(f.rating === null) return "Keine Bewertungen"; return "★ " + f.rating.toFixed(1) + " (" + f.count + ")"; }
 function groesseBadge(f){
   const map2 = { gross: ["Grösser / etabliert", "#4C7A4E"], mittel: ["Mittlerer Betrieb", "#B5813A"], klein: ["Eher klein", "#A6473F"], unklar: ["Grösse unklar", "#6B645B"] };
   const [label, color] = map2[f.groesse] || map2.unklar;
   return `<span style="display:inline-block;font-size:11px;font-weight:700;color:${color};border:1px solid ${color};border-radius:2px;padding:1px 6px;">${label}</span>`;
 }
-function mapsLink(f){
-  return "https://www.google.com/maps/place/?q=place_id:" + f.placeId;
+function mapsLink(f){ return "https://www.google.com/maps/place/?q=place_id:" + f.placeId; }
+
+function fileListHtml(f){
+  const files = status[f.placeId].files || [];
+  if(files.length === 0) return `<div class="upload-status" data-uploadmsg="${f.placeId}"></div>`;
+  return `<div class="file-list">` + files.map((file, i) => `
+    <div class="file-item">
+      <a href="${file.dataUrl}" download="${file.name}" title="${file.name} (${Math.round((file.size||0)/1024)} KB) – herunterladen/öffnen">${file.name}</a>
+      <button class="file-del" data-filedelete="${f.placeId}::${i}" title="Entfernen">✕</button>
+    </div>`).join('') + `</div><div class="upload-status" data-uploadmsg="${f.placeId}"></div>`;
+}
+function docsBoxHtml(f){
+  return `<div class="docs-box">
+    <div class="field-label">Kontakt-Dokumentation</div>
+    <label class="field-label" style="margin-top:2px;">Gesendete E-Mail (Text)</label>
+    <textarea data-email="${f.placeId}" placeholder="E-Mail-Text hier einfügen…">${status[f.placeId].emailText || ""}</textarea>
+    <label class="field-label" style="margin-top:2px;">Dokumente (Ausschreibung, Angebot, …)</label>
+    ${fileListHtml(f)}
+    <button class="file-upload-btn" data-filebtn="${f.placeId}">📎 Datei hochladen</button>
+    <input type="file" data-fileinput="${f.placeId}" style="display:none">
+  </div>`;
 }
 function controlsHtml(f){
   const s = status[f.placeId];
-  const esc = (str) => (str || "").replace(/"/g, "&quot;");
   return `<div class="card-controls">
     <div class="controls-row">
       <button class="fav-btn ${s.favorite ? 'active' : ''}" data-fav="${f.placeId}" title="Favorit">${s.favorite ? '★' : '☆'}</button>
       <label class="contacted-label"><input type="checkbox" data-contacted="${f.placeId}" ${s.contacted ? 'checked' : ''}> Kontaktiert</label>
     </div>
     <textarea data-note="${f.placeId}" placeholder="Notiz (z.B. Angebot erhalten, Termin vereinbart…)">${s.note || ""}</textarea>
+    ${s.contacted ? docsBoxHtml(f) : ""}
   </div>`;
 }
 function popupHtml(f){
+  const s = status[f.placeId];
   return `<div class="popup">
-    <span class="city-tag">${f.ort}</span>
-    <h3>${status[f.placeId].favorite ? '★ ' : ''}${f.name}</h3>
+    <span class="tag city-tag">${f.ort}</span><span class="tag cat-tag">${f.kategorie}</span>
+    <h3>${s.favorite ? '★ ' : ''}${f.name}</h3>
     <p>${f.adresse}</p>
     ${f.tel ? `<p>Tel: <a href="tel:${f.tel.replace(/\s/g,'')}">${f.tel}</a></p>` : `<p>Tel: nicht hinterlegt</p>`}
     <p class="rating ${ratingClass(f.rating)}">${ratingLabel(f)}</p>
@@ -453,30 +370,43 @@ function popupHtml(f){
 }
 
 const markers = {};
-firmen.forEach((f, i) => {
-  const m = L.marker([f.lat, f.lng]).addTo(map).bindPopup(() => popupHtml(f));
-  markers[i] = m;
-});
+firmen.forEach((f, i) => { markers[i] = L.marker([f.lat, f.lng]).addTo(map).bindPopup(() => popupHtml(f)); });
 function refreshOpenPopups(){
-  firmen.forEach((f, i) => {
-    const m = markers[i];
-    if(m.isPopupOpen()){ m.setPopupContent(popupHtml(f)); }
-  });
+  firmen.forEach((f, i) => { const m = markers[i]; if(m.isPopupOpen()){ m.setPopupContent(popupHtml(f)); } });
 }
 
-// ---------- Globale Delegation für Favorit/Kontaktiert/Notiz ----------
-// Funktioniert sowohl für Sidebar-Karten als auch für Kartenpopups.
+// ---------- Globale Delegation ----------
 document.addEventListener('click', (e) => {
   const favBtn = e.target.closest('[data-fav]');
-  if(favBtn){ toggleFavorite(favBtn.dataset.fav); }
+  if(favBtn){ toggleFavorite(favBtn.dataset.fav); return; }
+  const fileBtn = e.target.closest('[data-filebtn]');
+  if(fileBtn){
+    const pid = fileBtn.dataset.filebtn;
+    const input = document.querySelector(`.leaflet-popup [data-fileinput="${pid}"], #list [data-fileinput="${pid}"]`);
+    // Falls mehrere (Liste + Popup gleichzeitig gerendert) offen sind, das dem Klick am nächsten liegende nehmen
+    const scope = fileBtn.closest('.docs-box');
+    const localInput = scope ? scope.querySelector('[data-fileinput]') : input;
+    (localInput || input) && (localInput || input).click();
+    return;
+  }
+  const delBtn = e.target.closest('[data-filedelete]');
+  if(delBtn){
+    const [pid, idx] = delBtn.dataset.filedelete.split('::');
+    deleteFile(pid, parseInt(idx, 10));
+    return;
+  }
 });
 document.addEventListener('change', (e) => {
   const cb = e.target.closest('[data-contacted]');
-  if(cb){ toggleContacted(cb.dataset.contacted, cb.checked); }
+  if(cb){ toggleContacted(cb.dataset.contacted, cb.checked); return; }
+  const fi = e.target.closest('[data-fileinput]');
+  if(fi && fi.files && fi.files[0]){ uploadFile(fi.dataset.fileinput, fi.files[0]); fi.value = ""; return; }
 });
 document.addEventListener('focusout', (e) => {
   const ta = e.target.closest('[data-note]');
-  if(ta){ saveNote(ta.dataset.note, ta.value); }
+  if(ta){ saveNote(ta.dataset.note, ta.value); return; }
+  const em = e.target.closest('[data-email]');
+  if(em){ saveEmailText(em.dataset.email, em.value); return; }
 });
 
 // ---------- Sidebar ----------
@@ -495,12 +425,18 @@ favChip.textContent = '★ Nur Favoriten';
 favChip.onclick = () => { onlyFav = !onlyFav; favChip.classList.toggle('active', onlyFav); render(); };
 filtersEl.appendChild(favChip);
 
-document.getElementById('search').addEventListener('input', (e) => {
-  activeSearch = e.target.value.toLowerCase();
-  render();
+const catFiltersEl = document.getElementById('catFilters');
+kategorien.forEach(k => {
+  const btn = document.createElement('button');
+  btn.className = 'chip cat-chip' + (k === activeCategory ? ' active' : '');
+  btn.textContent = k;
+  btn.onclick = () => { activeCategory = k; render(); };
+  btn.dataset.kategorie = k;
+  catFiltersEl.appendChild(btn);
 });
 
-// Klick auf Karte (ausser auf die Controls) -> auf Karte zentrieren + Popup öffnen
+document.getElementById('search').addEventListener('input', (e) => { activeSearch = e.target.value.toLowerCase(); render(); });
+
 document.getElementById('list').addEventListener('click', (e) => {
   const main = e.target.closest('.card-main');
   if(!main) return;
@@ -513,6 +449,7 @@ document.getElementById('list').addEventListener('click', (e) => {
 
 function render(){
   document.querySelectorAll('.chip[data-city]').forEach(b => b.classList.toggle('active', b.dataset.city === activeCity));
+  document.querySelectorAll('.chip[data-kategorie]').forEach(b => b.classList.toggle('active', b.dataset.kategorie === activeCategory));
   const list = document.getElementById('list');
   const scrollPos = list.parentElement.scrollTop;
   list.innerHTML = '';
@@ -520,9 +457,10 @@ function render(){
   firmen.forEach((f, i) => {
     const s = status[f.placeId];
     const cityMatch = activeCity === "Alle" || f.ort === activeCity;
+    const catMatch = activeCategory === "Alle" || f.kategorie === activeCategory;
     const searchMatch = !activeSearch || f.name.toLowerCase().includes(activeSearch) || f.adresse.toLowerCase().includes(activeSearch);
     const favMatch = !onlyFav || s.favorite;
-    const visible = cityMatch && searchMatch && favMatch;
+    const visible = cityMatch && catMatch && searchMatch && favMatch;
     markers[i].getElement() && (markers[i].getElement().style.display = visible ? '' : 'none');
     if(!visible) return;
     shown++;
@@ -530,7 +468,7 @@ function render(){
     li.className = 'card' + (s.favorite ? ' is-fav' : '') + (s.contacted ? ' is-contacted' : '');
     li.innerHTML = `
       <div class="card-main" data-placeid="${f.placeId}">
-        <span class="city-tag">${f.ort}</span>
+        <span class="tag city-tag">${f.ort}</span><span class="tag cat-tag">${f.kategorie}</span>
         <h3>${s.favorite ? '★ ' : ''}${f.name}</h3>
         <div class="addr">${f.adresse}</div>
         <div class="rating ${ratingClass(f.rating)}">${ratingLabel(f)}</div>
