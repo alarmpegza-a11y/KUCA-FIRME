@@ -282,12 +282,12 @@
 // }
 // ============================================================
 const firebaseConfig = {
-  apiKey: "DEIN_API_KEY",
-  authDomain: "DEIN_PROJECT.firebaseapp.com",
-  projectId: "DEIN_PROJECT",
-  storageBucket: "DEIN_PROJECT.appspot.com",
-  messagingSenderId: "DEINE_SENDER_ID",
-  appId: "DEINE_APP_ID"
+  apiKey: "AIzaSyD19rUNDwsmw7ToGxJKSGlWzP1aSJof3kw",
+  authDomain: "bosnien-app.firebaseapp.com",
+  projectId: "bosnien-app",
+  storageBucket: "bosnien-app.firebasestorage.app",
+  messagingSenderId: "699054909708",
+  appId: "1:699054909708:web:ead5ab501af5145bce4129"
 };
 
 let db = null;
@@ -298,7 +298,12 @@ function isConfigFilledIn(){
   return !Object.values(firebaseConfig).some(v => typeof v === "string" && v.startsWith("DEIN"));
 }
 
-if(isConfigFilledIn()){
+if(typeof firebase === "undefined"){
+  document.getElementById('configBanner').style.display = "block";
+  document.getElementById('configBanner').textContent = "⚠ Die Firebase-Bibliothek konnte nicht geladen werden (Netzwerk/Werbeblocker?). Prüfe im Browser die Konsole (F12) und den Netzwerk-Tab auf blockierte Anfragen zu gstatic.com.";
+  syncStatusEl.textContent = "Firebase-Skripte nicht geladen.";
+  syncStatusEl.className = "error";
+}else if(isConfigFilledIn()){
   try{
     firebase.initializeApp(firebaseConfig);
     db = firebase.firestore();
@@ -306,7 +311,7 @@ if(isConfigFilledIn()){
     syncStatusEl.textContent = "Verbinde mit Firebase…";
   }catch(err){
     console.error("Firebase-Init fehlgeschlagen:", err);
-    syncStatusEl.textContent = "Firebase-Verbindung fehlgeschlagen – Änderungen werden nicht gespeichert.";
+    syncStatusEl.textContent = "Firebase-Verbindung fehlgeschlagen: " + err.message;
     syncStatusEl.className = "error";
   }
 }else{
